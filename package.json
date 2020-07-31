@@ -1,0 +1,30 @@
+{
+  "name": "ppt-to-video",
+  "version": "1.0.2",
+  "description": "ppt-to-video by Muhammad Rizwan",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Muhammad Rizwan",
+  "license": "ISC",
+  "contributors": [
+    {
+      "name": "Muhammad Rizwan",
+      "email": "razzyshaikh@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jshttp/accepts.git"
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "gm": "^1.23.1",
+    "libreoffice-convert": "^1.1.1",
+    "lodash": "^4.17.19",
+    "path": "^0.12.7",
+    "pdf2pic": "^1.4.0",
+    "videoshow": "^0.1.12"
+  }
+}
