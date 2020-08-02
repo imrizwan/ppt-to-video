@@ -1,6 +1,6 @@
 {
   "name": "ppt-to-video",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "ppt-to-video by Muhammad Rizwan",
   "main": "index.js",
   "scripts": {
@@ -14,9 +14,8 @@
       "email": "razzyshaikh@gmail.com"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jshttp/accepts.git"
+  "publishConfig": {
+    "registry":"https://npm.pkg.github.com/"
   },
   "dependencies": {
     "fs": "0.0.1-security",
