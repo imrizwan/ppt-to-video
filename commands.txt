@@ -1,0 +1,1 @@
+soffice --headless --convert-to pdf --outdir "C:\myData\Fun\ppt-to-video\build\src\images" "C:\myData\Fun\ppt-to-video\build\src\presentation.pptx"
