@@ -1,4 +1,4 @@
-const PDF2Pic = require("pdf2pic")
+const pdf2pic = require("pdf2pic")
 const videoshow = require("videoshow")
 const _ = require("lodash")
 const path = require("path")
@@ -38,15 +38,14 @@ function libreConverter(readFile, outputPath) {
 }
 function pdf2picConverter(outputPath, pdf2PicOptions) {
   return new Promise((resolve, reject) => {
-    const pdf2pic = new PDF2Pic(pdf2PicOptions)
-
-    pdf2pic.convertBulk(outputPath, -1).then(() => { //resolve
-      resolve("PDF converted to png")
+    const convert = pdf2pic.fromPath(outputPath, pdf2PicOptions);
+    
+    convert.bulk(-1).then((resolve_bulk) => {
+      resolve("PDF converted to png");
     }).catch((err) => {
-      reject("error from PDF2Pic", err)
-    })
-  }
-  )
+      reject("error from PDF2Pic", err);
+    });
+  });
 }
 
 
@@ -89,9 +88,15 @@ function p2vConverter(filepath, filename, videoOptions, pdf2PicOptions, videoPat
       if (thumbnail) {
         await generateThumbnail(outputPath, filename, thumbnailPath).then(thumbnailMessage => console.log(thumbnailMessage))
       }
-      pdf2PicOptions.savedir = exportPath
-      pdf2PicOptions.savename = filename
-      await pdf2picConverter(outputPath, pdf2PicOptions).then(p2pMessage => console.log(p2pMessage))
+      
+      // Configure pdf2pic options with output directory
+      const pdfOptions = {
+        ...pdf2PicOptions,
+        saveFilename: `${filename}.%d`,
+        savePath: exportPath
+      };
+      
+      await pdf2picConverter(outputPath, pdfOptions).then(p2pMessage => console.log(p2pMessage))
       await converttoVideo(exportPath, filename, videoOptions, videoPath).then(ctvMessage => {
         return ctvMessage
       })

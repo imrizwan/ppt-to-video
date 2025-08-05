@@ -77,3 +77,17 @@ app.listen(8080, function () {
 });
 
 ```
+
+## Testing
+
+To run the tests:
+
+```
+  $ npm test
+```
+
+For more detailed testing with Mocha:
+
+```
+  $ npm run test:mocha
+```
