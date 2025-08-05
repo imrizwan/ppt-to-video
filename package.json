@@ -1,10 +1,12 @@
 {
   "name": "ppt-to-video",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "ppt-to-video by Muhammad Rizwan",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "node test/index.test.js",
+    "test:mocha": "mocha test/*.test.js"
   },
   "author": "Muhammad Rizwan",
   "license": "ISC",
@@ -16,12 +18,13 @@
   ],
   "repository": "https://github.com/imrizwan/ppt-to-video",
   "dependencies": {
-    "fs": "0.0.1-security",
     "gm": "^1.23.1",
     "libreoffice-convert": "^1.1.1",
     "lodash": "^4.17.19",
-    "path": "^0.12.7",
-    "pdf2pic": "^1.4.0",
+    "pdf2pic": "^3.2.0",
     "videoshow": "^0.1.12"
+  },
+  "devDependencies": {
+    "mocha": "^11.7.1"
   }
 }
