@@ -1,12 +1,33 @@
 {
   "name": "ppt-to-video",
-  "version": "1.1.0",
-  "description": "ppt-to-video by Muhammad Rizwan",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "WASM-first PPT/PDF to video conversion toolkit",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./worker": {
+      "types": "./dist/types/wasm/worker.d.ts",
+      "import": "./dist/esm/wasm/worker.js"
+    }
+  },
   "scripts": {
-    "start": "node index.js",
-    "test": "node test/index.test.js",
-    "test:mocha": "mocha test/*.test.js"
+    "build": "tsup",
+    "clean": "rimraf dist coverage",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "test:real-pdf": "vitest run test/integration/real-pdf-conversion.test.ts --coverage=false",
+    "test:complete": "npm run lint && npm run typecheck && npm run test && npm run test:perf && npm run test:real-pdf && npm run build",
+    "test:perf": "vitest run test/perf",
+    "lint": "eslint \"src/**/*.ts\" \"test/**/*.ts\"",
+    "ci": "npm run clean && npm run lint && npm run typecheck && npm run test && npm run test:perf"
   },
   "author": "Muhammad Rizwan",
   "license": "ISC",
@@ -17,14 +38,21 @@
     }
   ],
   "repository": "https://github.com/imrizwan/ppt-to-video",
-  "dependencies": {
-    "gm": "^1.23.1",
-    "libreoffice-convert": "^1.1.1",
-    "lodash": "^4.17.19",
-    "pdf2pic": "^3.2.0",
-    "videoshow": "^0.1.12"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "mocha": "^11.7.1"
+    "@types/node": "^24.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/parser": "^8.30.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.22.0",
+    "pdf-lib": "^1.17.1",
+    "rimraf": "^6.0.1",
+    "pptxgenjs": "^4.0.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
