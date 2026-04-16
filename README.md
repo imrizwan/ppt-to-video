@@ -271,7 +271,8 @@ Workflow file:
 2. Install dependencies with `npm ci`.
 3. Run strict validation using `npm run test:complete`.
 4. Compare local `package.json` version with the current npm version.
-5. Publish only when the local version is newer/unpublished.
+5. Publish to npm only when the local version is newer/unpublished.
+6. Publish to GitHub Packages as scoped package `@<github-owner>/ppt-to-video` when that scoped version is newer/unpublished.
 
 ### Required GitHub Secret
 
@@ -281,6 +282,8 @@ Add this repository secret in GitHub:
 
 Create token in npm:
 - npm -> Account Settings -> Access Tokens -> Generate New Token (Automation)
+
+`GITHUB_TOKEN` is used automatically by GitHub Actions for GitHub Packages publish.
 
 ### Important release rule
 
@@ -292,6 +295,14 @@ Typical release sequence:
 ```bash
 npm version patch
 git push origin master --follow-tags
+```
+
+### Install from GitHub Packages
+
+After the workflow publishes to GitHub Packages, install the scoped package:
+
+```bash
+npm install @imrizwan/ppt-to-video
 ```
 
 ## Architecture Overview

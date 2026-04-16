@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish to npm and GitHub Packages
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   publish:
@@ -54,8 +55,49 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Prepare GitHub Packages metadata
+        if: steps.version_check.outputs.publish == 'true'
+        shell: bash
+        run: |
+          node -e "const fs=require('fs'); const pkg=require('./package.json'); const owner=(process.env.OWNER||'').toLowerCase(); const base=pkg.name.includes('/') ? pkg.name.split('/')[1] : pkg.name; pkg.name='@'+owner+'/'+base; pkg.publishConfig={...(pkg.publishConfig||{}), registry:'https://npm.pkg.github.com'}; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2)+'\n');"
+        env:
+          OWNER: ${{ github.repository_owner }}
+
+      - name: Check GitHub Packages version
+        if: steps.version_check.outputs.publish == 'true'
+        id: ghp_check
+        shell: bash
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version --registry https://npm.pkg.github.com 2>/dev/null || echo "not-published")
+
+          echo "package_name=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
+          echo "local_version=$LOCAL_VERSION" >> "$GITHUB_OUTPUT"
+          echo "published_version=$PUBLISHED_VERSION" >> "$GITHUB_OUTPUT"
+
+          if [ "$LOCAL_VERSION" = "$PUBLISHED_VERSION" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "GitHub package version already published. Skipping."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "Publishing to GitHub Packages."
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to GitHub Packages
+        if: steps.version_check.outputs.publish == 'true' && steps.ghp_check.outputs.publish == 'true'
+        run: npm publish --registry https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish summary
         run: |
           echo "Local version: ${{ steps.version_check.outputs.local_version }}"
           echo "Published version: ${{ steps.version_check.outputs.published_version }}"
-          echo "Publish executed: ${{ steps.version_check.outputs.publish }}"
+          echo "npm publish executed: ${{ steps.version_check.outputs.publish }}"
+          echo "GitHub package: ${{ steps.ghp_check.outputs.package_name }}"
+          echo "GitHub local version: ${{ steps.ghp_check.outputs.local_version }}"
+          echo "GitHub published version: ${{ steps.ghp_check.outputs.published_version }}"
+          echo "GitHub publish executed: ${{ steps.ghp_check.outputs.publish }}"
