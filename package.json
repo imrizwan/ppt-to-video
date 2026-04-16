@@ -1,6 +1,6 @@
 {
   "name": "ppt-to-video",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "WASM-first PPT/PDF to video conversion toolkit",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
