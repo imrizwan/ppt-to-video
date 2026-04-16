@@ -28,6 +28,7 @@ Node.js `>=20` is recommended.
 - [Legacy API Migration](#legacy-api-migration)
 - [Error Handling](#error-handling)
 - [Testing and Quality Gates](#testing-and-quality-gates)
+- [Auto Publish to npm (GitHub Actions)](#auto-publish-to-npm-github-actions)
 - [Architecture Overview](#architecture-overview)
 - [FAQ](#faq)
 
@@ -255,6 +256,42 @@ This project uses a strict no-tolerance quality policy.
 
 ```bash
 npm run test:complete
+```
+
+## Auto Publish to npm (GitHub Actions)
+
+This repository is configured to publish automatically to npm when code is pushed to `master`.
+
+Workflow file:
+- `.github/workflows/publish-npm.yml`
+
+### How it works
+
+1. Trigger on push to `master` (or manual `workflow_dispatch`).
+2. Install dependencies with `npm ci`.
+3. Run strict validation using `npm run test:complete`.
+4. Compare local `package.json` version with the current npm version.
+5. Publish only when the local version is newer/unpublished.
+
+### Required GitHub Secret
+
+Add this repository secret in GitHub:
+
+- `NPM_TOKEN` - npm automation token with publish access to `ppt-to-video`.
+
+Create token in npm:
+- npm -> Account Settings -> Access Tokens -> Generate New Token (Automation)
+
+### Important release rule
+
+Each publish requires a new version.  
+If `package.json` version matches npm's latest published version, workflow will skip publishing.
+
+Typical release sequence:
+
+```bash
+npm version patch
+git push origin master --follow-tags
 ```
 
 ## Architecture Overview

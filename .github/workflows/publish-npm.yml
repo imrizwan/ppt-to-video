@@ -1,0 +1,61 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate package quality gates
+        run: npm run test:complete
+
+      - name: Check if version is unpublished
+        id: version_check
+        shell: bash
+        run: |
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version 2>/dev/null || echo "not-published")
+
+          echo "local_version=$LOCAL_VERSION" >> "$GITHUB_OUTPUT"
+          echo "published_version=$PUBLISHED_VERSION" >> "$GITHUB_OUTPUT"
+
+          if [ "$LOCAL_VERSION" = "$PUBLISHED_VERSION" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Version already published. Skipping publish."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "New version detected. Publishing."
+          fi
+
+      - name: Publish package
+        if: steps.version_check.outputs.publish == 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish summary
+        run: |
+          echo "Local version: ${{ steps.version_check.outputs.local_version }}"
+          echo "Published version: ${{ steps.version_check.outputs.published_version }}"
+          echo "Publish executed: ${{ steps.version_check.outputs.publish }}"
